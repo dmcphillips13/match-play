@@ -2,103 +2,168 @@
 
 import { useRouter } from 'next/navigation';
 
-interface GolfCourse {
+interface TeeTime {
   id: string;
-  name: string;
-  imageUrl: string;
-  description: string;
+  courseId: string;
+  courseName: string;
+  courseImage: string;
+  date: string;
+  time: string;
+  players: number;
+  confirmed: boolean;
 }
 
-export default function BookTeeTimePage() {
+export default function UserTeeTimes() {
   const router = useRouter();
 
-  // Golf course data with images and descriptions
-  const courses: GolfCourse[] = [
+  // Mock data for user's tee times
+  const upcomingTeeTimes: TeeTime[] = [
     {
-      id: 'pinehill',
-      name: 'Pine Hill Golf Club',
-      imageUrl: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?q=80&w=2070&auto=format&fit=crop',
-      description: 'Scenic 18-hole championship course nestled among towering pines.'
+      id: '123abc',
+      courseId: 'pinehill',
+      courseName: 'Pine Hill Golf Club',
+      courseImage: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?q=80&w=2070&auto=format&fit=crop',
+      date: '2024-04-15',
+      time: '09:30 AM',
+      players: 4,
+      confirmed: true,
     },
     {
-      id: 'meadows',
-      name: 'The Meadows',
-      imageUrl: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?q=80&w=2070&auto=format&fit=crop',
-      description: 'Open layout with rolling fairways and challenging water features.'
-    },
-    {
-      id: 'lakeside',
-      name: 'Lakeside Golf Course',
-      imageUrl: 'https://images.unsplash.com/photo-1510534316479-a9b4893f7e5a?q=80&w=2069&auto=format&fit=crop',
-      description: 'Stunning waterfront views with signature holes along the lakefront.'
-    },
-    {
-      id: 'oakridge',
-      name: 'Oak Ridge Country Club',
-      imageUrl: 'https://images.unsplash.com/photo-1611165334142-b8455843c91e?q=80&w=2070&auto=format&fit=crop',
-      description: 'Premium private club featuring meticulously maintained greens.'
+      id: '456def',
+      courseId: 'meadows',
+      courseName: 'The Meadows',
+      courseImage: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?q=80&w=2070&auto=format&fit=crop',
+      date: '2024-04-22',
+      time: '10:15 AM',
+      players: 3,
+      confirmed: false,
     },
   ];
 
-  const handleCourseSelect = (courseId: string) => {
-    // In a real app, this would navigate to a page showing available tee times
-    router.push(`/book-tee-time/${courseId}`);
+  const pastTeeTimes: TeeTime[] = [
+    {
+      id: '789ghi',
+      courseId: 'lakeside',
+      courseName: 'Lakeside Golf Course',
+      courseImage: 'https://images.unsplash.com/photo-1510534316479-a9b4893f7e5a?q=80&w=2069&auto=format&fit=crop',
+      date: '2024-03-28',
+      time: '08:00 AM',
+      players: 2,
+      confirmed: true,
+    },
+  ];
+
+  // Format date to a more readable format
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   };
 
-  const handleBackToProfile = () => {
-    router.push('/profile');
+  const handleBookNew = () => {
+    router.push('/golf-courses');
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-[url('https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?q=80&w=2070')] bg-cover bg-fixed bg-center p-6">
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/70 -z-10" />
-
-      <header className="w-full max-w-6xl">
-        <div className="aero-card p-6 mb-8">
-          <div className="flex justify-between items-center">
-            <h1 className="text-4xl font-bold text-primary">Match Play</h1>
-            <button
-              onClick={handleBackToProfile}
-              className="glass-button"
-            >
-              Back to Profile
-            </button>
-          </div>
-          <h2 className="text-2xl mt-4">Select a Golf Course</h2>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="aero-card p-6 mb-8">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Your Tee Times</h1>
+          <button
+            onClick={handleBookNew}
+            className="glass-button primary-gradient text-white"
+          >
+            Book New Tee Time
+          </button>
         </div>
-      </header>
+      </div>
 
-      <main className="w-full max-w-6xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {courses.map((course) => (
-            <div
-              key={course.id}
-              onClick={() => handleCourseSelect(course.id)}
-              className="aero-card overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group h-72"
-            >
-              <div
-                className="h-48 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                style={{ backgroundImage: `url(${course.imageUrl})` }}
-              />
-              <div className="p-5 flex-1 flex flex-col relative">
-                <div className="absolute top-0 right-0 w-16 h-16 bg-primary-light rounded-bl-2xl flex items-center justify-center -mt-16 mr-4 aero-blur group-hover:bg-primary transition-colors duration-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold">{course.name}</h3>
-                <p className="text-foreground/80 mt-1 text-sm flex-1">{course.description}</p>
-                <div className="mt-2 text-primary text-sm font-medium flex items-center">
-                  View available tee times
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
+      {/* Upcoming Tee Times */}
+      <div className="mb-12">
+        <h2 className="text-xl font-semibold mb-4">Upcoming Tee Times</h2>
+        {upcomingTeeTimes.length > 0 ? (
+          <div className="space-y-4">
+            {upcomingTeeTimes.map((teeTime) => (
+              <div key={teeTime.id} className="aero-card p-0 overflow-hidden">
+                <div className="flex flex-col md:flex-row">
+                  <div className="md:w-1/4 h-48 md:h-auto">
+                    <div
+                      className="w-full h-full bg-cover bg-center"
+                      style={{ backgroundImage: `url(${teeTime.courseImage})` }}
+                    />
+                  </div>
+                  <div className="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="flex justify-between items-start">
+                        <h3 className="text-lg font-bold">{teeTime.courseName}</h3>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${teeTime.confirmed
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                          {teeTime.confirmed ? 'Confirmed' : 'Pending'}
+                        </span>
+                      </div>
+                      <p className="text-lg font-medium text-primary mt-2">
+                        {formatDate(teeTime.date)} at {teeTime.time}
+                      </p>
+                      <p className="text-sm text-foreground/70 mt-1">
+                        {teeTime.players} {teeTime.players === 1 ? 'player' : 'players'}
+                      </p>
+                    </div>
+                    <div className="flex gap-3 mt-4">
+                      <button className="glass-button text-sm">View Details</button>
+                      {!teeTime.confirmed && (
+                        <button className="glass-button text-sm">Confirm</button>
+                      )}
+                      <button className="glass-button text-sm text-red-500">Cancel</button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </main>
+            ))}
+          </div>
+        ) : (
+          <div className="aero-card p-8 text-center">
+            <p className="text-foreground/70">You don&apos;t have any upcoming tee times.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Past Tee Times */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Past Tee Times</h2>
+        {pastTeeTimes.length > 0 ? (
+          <div className="space-y-4">
+            {pastTeeTimes.map((teeTime) => (
+              <div key={teeTime.id} className="aero-card p-0 overflow-hidden opacity-70 hover:opacity-100 transition-opacity">
+                <div className="flex flex-col md:flex-row">
+                  <div className="md:w-1/4 h-48 md:h-auto">
+                    <div
+                      className="w-full h-full bg-cover bg-center grayscale"
+                      style={{ backgroundImage: `url(${teeTime.courseImage})` }}
+                    />
+                  </div>
+                  <div className="p-6 flex-1">
+                    <h3 className="text-lg font-bold">{teeTime.courseName}</h3>
+                    <p className="text-lg font-medium mt-2">
+                      {formatDate(teeTime.date)} at {teeTime.time}
+                    </p>
+                    <p className="text-sm text-foreground/70 mt-1">
+                      {teeTime.players} {teeTime.players === 1 ? 'player' : 'players'}
+                    </p>
+                    <div className="mt-4">
+                      <button className="glass-button text-sm">View Scorecard</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="aero-card p-8 text-center">
+            <p className="text-foreground/70">You don&apos;t have any past tee times.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
