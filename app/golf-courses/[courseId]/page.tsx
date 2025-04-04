@@ -2,11 +2,21 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { getGolfCourse } from '../../api/data';
 
 interface Course {
   id: string;
   name: string;
   imageUrl: string;
+  description: string;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  zipCode: string | null;
+  phone: string | null;
+  website: string | null;
+  par: number | null;
+  holes: number;
 }
 
 interface TimeSlot {
@@ -20,30 +30,6 @@ interface DaySchedule {
   dateString: string;
   times: TimeSlot[];
 }
-
-// Mock data - would come from API in real app
-const COURSES: Record<string, Course> = {
-  'pinehill': {
-    id: 'pinehill',
-    name: 'Pine Hill Golf Club',
-    imageUrl: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?q=80&w=2070&auto=format&fit=crop',
-  },
-  'meadows': {
-    id: 'meadows',
-    name: 'The Meadows',
-    imageUrl: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?q=80&w=2070&auto=format&fit=crop',
-  },
-  'lakeside': {
-    id: 'lakeside',
-    name: 'Lakeside Golf Course',
-    imageUrl: 'https://images.unsplash.com/photo-1510534316479-a9b4893f7e5a?q=80&w=2069&auto=format&fit=crop',
-  },
-  'oakridge': {
-    id: 'oakridge',
-    name: 'Oak Ridge Country Club',
-    imageUrl: 'https://images.unsplash.com/photo-1611165334142-b8455843c91e?q=80&w=2070&auto=format&fit=crop',
-  },
-};
 
 // Generate mock tee times for today and the next 6 days
 const generateTeeTimes = (): DaySchedule[] => {
@@ -85,15 +71,31 @@ export default function CourseTeeTimes({ params }: { params: { courseId: string;
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [players, setPlayers] = useState(4);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // In a real app, this would fetch the course and tee times from an API
-    if (params.courseId && COURSES[params.courseId]) {
-      setCourse(COURSES[params.courseId]);
-      setTeeTimes(generateTeeTimes());
-      setSelectedDate(new Date()); // Default to today
+    async function fetchCourseData() {
+      try {
+        setLoading(true);
+        // Fetch the course from the API
+        const courseData = await getGolfCourse(params.courseId);
+        setCourse(courseData);
+        setTeeTimes(generateTeeTimes());
+        setSelectedDate(new Date()); // Default to today
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching course:', err);
+        setError('Failed to load course information. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (params.courseId) {
+      fetchCourseData();
     } else {
-      // Course not found
+      // No course ID provided
       router.push('/golf-courses');
     }
   }, [params.courseId, router]);
@@ -108,11 +110,44 @@ export default function CourseTeeTimes({ params }: { params: { courseId: string;
     router.push('/golf-courses');
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="aero-card p-8">
+          <div className="flex flex-col items-center">
+            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p>Loading course information...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="aero-card p-8 max-w-md">
+          <div className="flex flex-col items-center text-center">
+            <div className="text-red-500 mb-4 text-2xl">⚠️</div>
+            <h2 className="text-xl font-bold mb-2">Error</h2>
+            <p className="mb-4">{error}</p>
+            <button
+              onClick={() => router.push('/golf-courses')}
+              className="glass-button primary-gradient text-white"
+            >
+              Return to Courses
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!course) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="aero-card p-8">
-          <p>Loading course information...</p>
+          <p>Course not found. <button onClick={handleBack} className="text-primary">Return to Courses</button></p>
         </div>
       </div>
     );

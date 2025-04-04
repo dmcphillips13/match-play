@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// User model
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  teeTimesBooked  TeeTime[]       @relation("UserBookings")
+  friends         Friend[]        @relation("UserFriends")
+  friendOf        Friend[]        @relation("FriendOfUser")
+  userPreferences UserPreference?
+}
+
+model UserPreference {
+  id                String      @id @default(uuid())
+  userId            String      @unique
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  handicap          Float?
+  preferredTeeTime  String?
+  preferredCourseId String?
+  preferredCourse   GolfCourse? @relation(fields: [preferredCourseId], references: [id])
+}
+
+// Golf course model
+model GolfCourse {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  imageUrl    String
+  address     String?
+  city        String?
+  state       String?
+  zipCode     String?
+  phone       String?
+  website     String?
+  par         Int?
+  holes       Int      @default(18)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  teeTimes         TeeTime[]
+  preferredByUsers UserPreference[]
+}
+
+// Tee time model
+model TeeTime {
+  id        String   @id @default(uuid())
+  date      DateTime
+  time      String
+  players   Int      @default(4)
+  confirmed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId   String
+  user     User       @relation("UserBookings", fields: [userId], references: [id])
+  courseId String
+  course   GolfCourse @relation(fields: [courseId], references: [id])
+}
+
+// Friend relationship model
+model Friend {
+  id        String   @id @default(uuid())
+  userId    String
+  friendId  String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user   User @relation("UserFriends", fields: [userId], references: [id])
+  friend User @relation("FriendOfUser", fields: [friendId], references: [id])
+
+  @@unique([userId, friendId])
+}
