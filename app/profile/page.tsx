@@ -31,7 +31,7 @@ export default function ProfilePage() {
 
   // Handle booking a new tee time
   const handleBookTeeTime = () => {
-    router.push('/book-tee-time');
+    router.push('/golf-courses');
   };
 
   if (loading) {
