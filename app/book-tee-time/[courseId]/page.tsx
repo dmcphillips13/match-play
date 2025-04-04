@@ -38,6 +38,7 @@ export default function CourseTeeTimes({ params }: { params: { courseId: string;
 
   const courseId = params.courseId;
   const courseName = courseData[courseId as keyof typeof courseData]?.name || 'Course Not Found';
+  const courseImage = courseData[courseId as keyof typeof courseData]?.imageUrl;
 
   // Get the next 7 days for date selection
   const getDateOptions = () => {
@@ -122,38 +123,46 @@ export default function CourseTeeTimes({ params }: { params: { courseId: string;
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-50 p-6">
-      <header className="w-full max-w-6xl">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-4xl font-bold text-blue-700">Match Play</h1>
-          <button
-            onClick={handleBackToCoursesClick}
-            className="text-blue-600 hover:text-blue-800"
-          >
-            Back to Courses
-          </button>
-        </div>
+    <div className="flex flex-col items-center min-h-screen bg-[url('https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?q=80&w=2070')] bg-cover bg-fixed bg-center p-6">
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/70 -z-10" />
 
-        <div
-          className="w-full h-48 bg-cover bg-center rounded-lg mb-6"
-          style={{
-            backgroundImage: `url(${courseData[courseId as keyof typeof courseData]?.imageUrl})`,
-            backgroundPosition: 'center 30%'
-          }}
-        >
-          <div className="w-full h-full flex items-end bg-gradient-to-t from-black/70 to-transparent p-6 rounded-lg">
-            <h2 className="text-3xl font-bold text-white">{courseName}</h2>
+      <header className="w-full max-w-6xl">
+        <div className="aero-card p-6 mb-8">
+          <div className="flex justify-between items-center">
+            <h1 className="text-4xl font-bold text-primary">Match Play</h1>
+            <button
+              onClick={handleBackToCoursesClick}
+              className="glass-button"
+            >
+              Back to Courses
+            </button>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow mb-6">
+        <div
+          className="w-full h-64 bg-cover bg-center rounded-2xl mb-6 overflow-hidden relative"
+        >
+          <img
+            src={courseImage}
+            alt={courseName}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-8">
+            <div className="aero-card p-6 -mb-16 w-full max-w-md">
+              <h2 className="text-3xl font-bold">{courseName}</h2>
+              <p className="text-primary mt-2">{dateOptions[0]?.label}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="aero-card p-6 mb-8 mt-16">
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <h3 className="text-xl font-semibold mb-3 sm:mb-0">Available Tee Times</h3>
             <div className="w-full sm:w-auto">
               <select
                 value={selectedDate}
                 onChange={handleDateChange}
-                className="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="glass-button w-full text-center sm:w-auto border-none"
               >
                 {dateOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -168,36 +177,50 @@ export default function CourseTeeTimes({ params }: { params: { courseId: string;
 
       <main className="w-full max-w-6xl">
         {loading ? (
-          <div className="flex justify-center py-12">
-            <p className="text-gray-600">Loading available tee times...</p>
+          <div className="aero-card p-12 flex justify-center">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="aero-card p-8">
             {availableTimes.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {availableTimes.map((timeSlot) => (
                   <div
                     key={timeSlot.id}
                     onClick={() => handleSelectTimeSlot(timeSlot)}
-                    className="border border-gray-200 rounded-lg p-4 hover:bg-blue-50 transition-colors cursor-pointer flex flex-col items-center text-center"
+                    className="aero-card p-5 hover:shadow-lg transition-all cursor-pointer group"
                   >
-                    <div className="text-xl font-bold">
+                    <div className="text-xl font-bold text-center group-hover:text-primary transition-colors">
                       {parseInt(timeSlot.time.split(':')[0]) > 12
                         ? `${parseInt(timeSlot.time.split(':')[0]) - 12}:${timeSlot.time.split(':')[1]} PM`
                         : `${timeSlot.time} AM`}
                     </div>
-                    <div className="text-gray-500 text-sm mt-1">
-                      {timeSlot.availableSpots} {timeSlot.availableSpots === 1 ? 'spot' : 'spots'} available
+                    <div className="flex items-center justify-between mt-3">
+                      <div className="text-foreground/70 text-sm">
+                        {timeSlot.availableSpots} {timeSlot.availableSpots === 1 ? 'spot' : 'spots'}
+                      </div>
+                      <div className="font-medium text-primary">
+                        {timeSlot.price}
+                      </div>
                     </div>
-                    <div className="font-medium text-blue-600 mt-2">
-                      {timeSlot.price}
+                    <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-primary/20 to-transparent mt-3 group-hover:via-primary transition-colors" />
+                    <div className="mt-2 text-center">
+                      <button className="text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                        Select →
+                      </button>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-600">No tee times available for this date. Please select another date.</p>
+              <div className="text-center py-12">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-primary-light flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <p className="text-foreground/80 mb-4">No tee times available for this date.</p>
+                <p className="text-primary">Please select another date.</p>
               </div>
             )}
           </div>

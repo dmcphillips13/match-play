@@ -1,8 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f6f8fa;
+  --foreground: #0a0f1a;
+  --primary: #00b074;
+  --primary-light: #e6f8f1;
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  --card-border: 1px solid rgba(255, 255, 255, 0.4);
+  --blur-bg: rgba(255, 255, 255, 0.6);
 }
 
 @theme inline {
@@ -14,13 +20,52 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0a0f1a;
+    --foreground: #f6f8fa;
+    --primary: #00b074;
+    --primary-light: #13352e;
+    --card-bg: rgba(20, 30, 48, 0.7);
+    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    --card-border: 1px solid rgba(255, 255, 255, 0.08);
+    --blur-bg: rgba(20, 30, 48, 0.7);
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+.aero-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  border: var(--card-border);
+}
+
+.aero-blur {
+  backdrop-filter: blur(16px);
+}
+
+.primary-gradient {
+  background: linear-gradient(135deg, var(--primary), #00d68f);
+}
+
+.glass-button {
+  background: var(--blur-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  padding: 10px 20px;
+  transition: all 0.3s ease;
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.glass-button:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
 }
